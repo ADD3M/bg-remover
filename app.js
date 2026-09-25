@@ -8,13 +8,18 @@
 // Library: @imgly/background-removal
 // Docs: https://www.npmjs.com/package/@imgly/background-removal
 //
-// If you outgrow the jsDelivr-hosted copy of the model, download it from
-// IMG.LY's CDN and point `publicPath` below at your own copy instead —
-// see "Custom Asset Serving" in the library's README.
+// Two DIFFERENT CDN locations are involved, and it matters which is used
+// for which:
+//   1. The JS library itself — small, so it's loaded below from jsDelivr.
+//   2. The AI model weights (.onnx) and WASM runtime — tens of MB, so
+//      IMG.LY hosts these separately on staticimgly.com and the library
+//      already knows that address by default. Do NOT set `publicPath` to
+//      the jsDelivr URL below — that directory only has the JS bundle, not
+//      the model, and doing so makes every single image fail the same way.
+//      Only set `publicPath` if you've deliberately copied the model files
+//      to your own server — see "Custom Asset Serving" in the docs above.
 
 import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/dist/index.mjs";
-
-const LIB_VERSION = "1.6.0";
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
@@ -72,7 +77,9 @@ async function handleFile(file) {
 
   try {
     const blob = await removeBackground(file, {
-      publicPath: `https://cdn.jsdelivr.net/npm/@imgly/background-removal@${LIB_VERSION}/dist/`,
+      // No publicPath here on purpose — see the note at the top of this
+      // file. Leaving it unset lets the library fetch the model from its
+      // own correct default CDN.
       output: { format: "image/png", quality: 1 },
       progress: setProgress,
     });

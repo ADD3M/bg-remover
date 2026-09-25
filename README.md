@@ -48,9 +48,15 @@ non-essential cookie is set.
 
 ## Notes
 
-- The model is pinned to `@imgly/background-removal@1.6.0` in `app.js` (two
-  spots: the `import` line and the `publicPath` inside the config) so the
-  site won't unexpectedly break on a future library release. Bump both
-  together if you want to upgrade.
+- The library is pinned to `@imgly/background-removal@1.6.0` on jsDelivr in
+  the `import` line of `app.js`, so the site won't unexpectedly break on a
+  future release. Bump the version there if you want to upgrade.
+- `app.js` deliberately does **not** set a `publicPath` in the config. The
+  JS library (small, loaded from jsDelivr above) and the AI model weights
+  (tens of MB, hosted separately by IMG.LY on staticimgly.com) live at two
+  different addresses — the library already defaults to the correct one for
+  the model. Pointing `publicPath` at the jsDelivr URL instead breaks
+  background removal for every image, since that location doesn't have the
+  model files.
 - No web fonts or analytics are loaded from anywhere, by design — it keeps
   the privacy story simple and true.
