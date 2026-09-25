@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cutout — remove image backgrounds in your browser</title>
+  <meta name="description" content="Drop in a photo and get back a transparent PNG. Everything runs on your own device — nothing is uploaded.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html">
+      <span class="wordmark-mark" aria-hidden="true"></span>
+      Cutout
+    </a>
+    <p class="header-note">Runs on your device · no uploads</p>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Remove the background.<br>Keep the browser.</h1>
+      <p class="lede">Drop in a photo and get back a clean, transparent PNG. The image is processed entirely on your own device — it's never sent anywhere.</p>
+    </section>
+
+    <section class="tool" id="tool" aria-live="polite">
+
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload an image to remove its background">
+        <span class="bracket bracket-tl" aria-hidden="true"></span>
+        <span class="bracket bracket-tr" aria-hidden="true"></span>
+        <span class="bracket bracket-bl" aria-hidden="true"></span>
+        <span class="bracket bracket-br" aria-hidden="true"></span>
+
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+
+        <div class="dropzone-content">
+          <p class="dz-title">Drag a photo here</p>
+          <p class="dz-sub">or <button type="button" id="browseBtn" class="link-btn">choose a file</button></p>
+          <p class="dz-hint">PNG, JPG or WEBP</p>
+        </div>
+      </div>
+
+      <div class="status" id="status" hidden>
+        <div class="status-bar"><div class="status-fill" id="statusFill"></div></div>
+        <p class="status-text" id="statusText">Loading the model…</p>
+        <p class="status-note">First run downloads the AI model and caches it in your browser — later images are much faster.</p>
+      </div>
+
+      <div class="result" id="result" hidden>
+        <div class="result-frame">
+          <div class="checker">
+            <img id="resultImg" alt="Photo with its background removed">
+          </div>
+        </div>
+        <div class="result-actions">
+          <button type="button" id="downloadBtn" class="btn btn-primary">Download PNG</button>
+          <button type="button" id="resetBtn" class="btn btn-ghost">Remove another</button>
+        </div>
+      </div>
+
+      <div class="error" id="error" hidden>
+        <p class="error-text" id="errorText"></p>
+        <button type="button" id="errorReset" class="btn btn-ghost">Try again</button>
+      </div>
+
+    </section>
+
+    <section class="how">
+      <h2>How it works</h2>
+      <div class="how-grid">
+        <div class="how-item">
+          <span class="how-num">01</span>
+          <h3>Pick a photo</h3>
+          <p>Drag one in or choose a file. It stays on your device the whole time.</p>
+        </div>
+        <div class="how-item">
+          <span class="how-num">02</span>
+          <h3>A model looks at it</h3>
+          <p>A small AI segmentation model runs locally in your browser, using WebAssembly, and separates the subject from the background.</p>
+        </div>
+        <div class="how-item">
+          <span class="how-num">03</span>
+          <h3>Get your PNG</h3>
+          <p>Download the cutout with a transparent background, ready to drop into anything.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Nothing you upload here ever leaves your browser.</p>
+    <nav class="footer-nav">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="cookies.html">Cookie Policy</a>
+    </nav>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
