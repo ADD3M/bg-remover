@@ -20,7 +20,7 @@
     <a class="back" href="index.html">← Back to the tool</a>
 
     <h1>Cookie Policy</h1>
-    <p class="updated">Last updated: September 25, 2026</p>
+    <p class="updated">Last updated: September 26, 2026</p>
 
     <p>
       This policy explains this site's (the "Site") use of cookies and
@@ -78,13 +78,25 @@
 
     <h2>Third parties</h2>
     <p>
-      The AI model files above are fetched from the jsDelivr content
-      delivery network on behalf of the
-      <code>@imgly/background-removal</code> library this tool uses. That
-      request is a normal file download and, to our knowledge, does not set
-      cookies. See jsDelivr's own
-      <a href="https://www.jsdelivr.com/network/privacy-policy" target="_blank" rel="noopener">privacy policy</a>
-      for details of how they handle these requests.
+      Loading the tool pulls in files from two different places — neither
+      of them is us, and neither is a cookie:
+    </p>
+    <ul>
+      <li>
+        <strong>jsDelivr</strong> serves the tool's own code — the
+        <code>@imgly/background-removal</code> library and its
+        <code>onnxruntime-web</code> companion. See jsDelivr's
+        <a href="https://www.jsdelivr.com/network/privacy-policy" target="_blank" rel="noopener">privacy policy</a>.
+      </li>
+      <li>
+        <strong><code>staticimgly.com</code></strong>, run by IMG.LY,
+        serves the actual AI model files described above. See IMG.LY's
+        <a href="https://img.ly/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.
+      </li>
+    </ul>
+    <p>
+      Both are normal file downloads and, to our knowledge, set no cookies
+      of their own.
     </p>
 
     <h2>If this ever changes</h2>
@@ -96,8 +108,9 @@
 
     <h2>Contact</h2>
     <p>
-      Questions about this policy can be sent to
-      [replace with your contact email or a link to your project's repository].
+      Questions about this policy can be raised by opening an issue on the
+      <a href="https://github.com/ADD3M/bg-remover/issues" target="_blank" rel="noopener">GitHub repository</a>
+      this Site is built from.
     </p>
   </main>
 
