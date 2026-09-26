@@ -346,12 +346,35 @@ button { font-family: inherit; }
   padding: 24px 24px 56px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   flex-wrap: wrap;
   color: var(--text-muted);
   font-size: 0.88rem;
   border-top: 1px solid var(--border);
+}
+
+.footer-left p { margin: 0; }
+
+.footer-cache {
+  margin-top: 8px !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.link-btn-muted {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.link-btn-muted:hover { color: var(--text); }
+
+.footer-cache-msg {
+  font-size: 0.85rem;
+  color: var(--accent);
 }
 
 .footer-nav {

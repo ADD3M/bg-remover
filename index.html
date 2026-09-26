@@ -7,6 +7,25 @@
   <meta name="description" content="Drop in a photo and get back a transparent PNG. Everything runs on your own device — nothing is uploaded.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
   <link rel="stylesheet" href="style.css">
+
+  <!--
+    The background-removal library dynamically imports "onnxruntime-web"
+    by its bare package name at runtime. That only resolves automatically
+    inside a bundler (Vite, webpack, etc.) — in a plain browser module
+    script, it needs this import map to know where to fetch it from.
+    Without this, the tool downloads the AI model successfully and then
+    fails right after, while trying to start the WASM engine.
+    Keep this version number in sync with the "onnxruntime-web" version
+    that dist/index.mjs of @imgly/background-removal@1.6.0 depends on.
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0-dev.20250206-d981b153d3/dist/ort.bundle.min.mjs",
+      "onnxruntime-web/webgpu": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0-dev.20250206-d981b153d3/dist/ort.webgpu.bundle.min.mjs"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -43,8 +62,7 @@
 
       <div class="status" id="status" hidden>
         <div class="status-bar"><div class="status-fill" id="statusFill"></div></div>
-        <p class="status-text" id="statusText">Loading the model…</p>
-        <p class="status-note">First run downloads the AI model and caches it in your browser — later images are much faster.</p>
+        <p class="status-text" id="statusText">Removing the background…</p>
       </div>
 
       <div class="result" id="result" hidden>
@@ -89,7 +107,13 @@
   </main>
 
   <footer class="site-footer">
-    <p>Nothing you upload here ever leaves your browser.</p>
+    <div class="footer-left">
+      <p>Nothing you upload here ever leaves your browser.</p>
+      <p class="footer-cache">
+        <button type="button" id="clearCacheBtn" class="link-btn link-btn-muted">Clear cached model</button>
+        <span id="clearCacheMsg" class="footer-cache-msg" role="status"></span>
+      </p>
+    </div>
     <nav class="footer-nav">
       <a href="privacy.html">Privacy Policy</a>
       <a href="cookies.html">Cookie Policy</a>

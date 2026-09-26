@@ -58,5 +58,22 @@ non-essential cookie is set.
   the model. Pointing `publicPath` at the jsDelivr URL instead breaks
   background removal for every image, since that location doesn't have the
   model files.
+- `index.html` includes an **import map** for `onnxruntime-web`. The
+  library dynamically `import()`s that package by bare name at runtime,
+  which only resolves automatically inside a bundler — in a plain browser
+  module script it needs the import map to know where to fetch it from.
+  Without it, the model downloads fine and the tool then fails right after,
+  while starting the WASM engine. If you ever bump the
+  `@imgly/background-removal` version, check whether the `onnxruntime-web`
+  version it depends on changed too (see its `package.json`
+  `dependencies`), and update the two URLs in the import map to match.
+- The library itself doesn't use the Cache Storage API for the model files
+  it downloads — it relies on the plain browser HTTP cache, which a page
+  can't selectively clear. So `app.js` wraps `fetch()` for requests to
+  IMG.LY's model CDN (`staticimgly.com`) in a small Cache-Storage-backed
+  layer of our own, which is what the "Clear cached model" button on the
+  page actually clears. It never touches the photo you upload — that's
+  handed to the library as a `File`, not a URL, so it never goes through
+  `fetch()` at all.
 - No web fonts or analytics are loaded from anywhere, by design — it keeps
   the privacy story simple and true.

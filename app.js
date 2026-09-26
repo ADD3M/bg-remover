@@ -21,6 +21,56 @@
 
 import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/dist/index.mjs";
 
+// -- Model caching --------------------------------------------------------
+//
+// The background-removal library fetches the (large, one-time) model and
+// WASM runtime files with the browser's normal, plain `fetch()` — it does
+// not use the Cache Storage API itself, so there is nothing built in that
+// a page can explicitly clear. To make the "Clear cached model" button
+// below actually do something, we put our own cache in front of it: any
+// request to IMG.LY's model CDN is served from a named Cache Storage
+// bucket we control, falling back to the network (and populating the
+// cache) the first time. This never touches the photo you upload — that
+// never goes through fetch() at all, since it's handed to the library as
+// a File, not a URL.
+const MODEL_CACHE_NAME = "cutout-model-cache-v1";
+const MODEL_ASSET_HOST = "staticimgly.com";
+
+function installModelCache() {
+  if (typeof window === "undefined" || !window.caches || window.__cutoutFetchPatched) return;
+  window.__cutoutFetchPatched = true;
+
+  const originalFetch = window.fetch.bind(window);
+
+  window.fetch = async (input, init) => {
+    const method = (init && init.method) || (input && input.method) || "GET";
+    const url = typeof input === "string" ? input : input && input.url;
+    const isModelAsset = url && method.toUpperCase() === "GET" && new URL(url, location.href).hostname === MODEL_ASSET_HOST;
+
+    if (!isModelAsset) return originalFetch(input, init);
+
+    try {
+      const cache = await caches.open(MODEL_CACHE_NAME);
+      const cached = await cache.match(url);
+      if (cached) return cached;
+
+      const response = await originalFetch(input, init);
+      if (response && response.ok) {
+        cache.put(url, response.clone()).catch(() => {});
+      }
+      return response;
+    } catch {
+      // Cache Storage unavailable or misbehaving — fall back to a plain
+      // network request rather than breaking the tool over it.
+      return originalFetch(input, init);
+    }
+  };
+}
+
+installModelCache();
+
+// -- DOM references --------------------------------------------------------
+
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
 const browseBtn = document.getElementById("browseBtn");
@@ -38,6 +88,9 @@ const errorEl = document.getElementById("error");
 const errorText = document.getElementById("errorText");
 const errorReset = document.getElementById("errorReset");
 
+const clearCacheBtn = document.getElementById("clearCacheBtn");
+const clearCacheMsg = document.getElementById("clearCacheMsg");
+
 const panels = [dropzone, statusEl, resultEl, errorEl];
 
 let currentObjectUrl = null;
@@ -47,18 +100,11 @@ function showPanel(panel) {
   for (const el of panels) el.hidden = el !== panel;
 }
 
-function describeProgress(key, pct) {
-  const k = String(key || "").toLowerCase();
-  if (k.includes("fetch")) return `Downloading the model… ${pct}%`;
-  if (k.includes("compute") || k.includes("inference")) return `Removing the background… ${pct}%`;
-  return `Working… ${pct}%`;
-}
-
 function setProgress(key, current, total) {
   if (!total) return;
   const pct = Math.max(0, Math.min(100, Math.round((current / total) * 100)));
   statusFill.style.width = pct + "%";
-  statusText.textContent = describeProgress(key, pct);
+  statusText.textContent = `Removing the background… ${pct}%`;
 }
 
 async function handleFile(file) {
@@ -72,7 +118,7 @@ async function handleFile(file) {
   currentFileBaseName = file.name.replace(/\.[^./\\]+$/, "") || "image";
 
   statusFill.style.width = "4%";
-  statusText.textContent = "Loading the model…";
+  statusText.textContent = "Removing the background…";
   showPanel(statusEl);
 
   try {
@@ -159,3 +205,29 @@ downloadBtn.addEventListener("click", () => {
 
 resetBtn.addEventListener("click", reset);
 errorReset.addEventListener("click", reset);
+
+// -- Clear cached model --
+
+if (clearCacheBtn) {
+  if (!window.caches) {
+    clearCacheBtn.disabled = true;
+    clearCacheBtn.title = "Not supported in this browser";
+  } else {
+    clearCacheBtn.addEventListener("click", async () => {
+      clearCacheBtn.disabled = true;
+      try {
+        const existed = await caches.delete(MODEL_CACHE_NAME);
+        clearCacheMsg.textContent = existed
+          ? "Cleared. The next image will re-download the model."
+          : "Nothing was cached.";
+      } catch {
+        clearCacheMsg.textContent = "Couldn't clear the cache — please try again.";
+      } finally {
+        clearCacheBtn.disabled = false;
+        setTimeout(() => {
+          clearCacheMsg.textContent = "";
+        }, 4000);
+      }
+    });
+  }
+}

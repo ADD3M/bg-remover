@@ -62,15 +62,18 @@
       <li>
         <strong>The background-removal model.</strong> The first time you
         use the background-removal tool, your browser downloads the AI
-        model files it needs and caches them locally, so future uses are
-        much faster. This is also a browser cache, not a cookie — it holds
-        no information about you or your images, only the reusable model
-        files themselves.
+        model files it needs and stores them locally, using the
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Cache" target="_blank" rel="noopener">Cache Storage API</a>
+        (a browser storage mechanism separate from cookies), so future uses
+        are much faster. It holds no information about you or your images —
+        only the reusable model files themselves. A "Clear cached model"
+        button at the bottom of the tool page lets you remove this at any
+        time.
       </li>
     </ul>
     <p>
-      Neither of these persists any personal information, and both can be
-      cleared at any time by clearing your browser's cache and site data.
+      Neither of these persists any personal information, and both can also
+      be cleared at any time by clearing your browser's cache and site data.
     </p>
 
     <h2>Third parties</h2>
